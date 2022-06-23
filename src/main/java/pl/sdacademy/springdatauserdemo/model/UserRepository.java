@@ -5,6 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<User, Long> {
     List<User> findAllByLastName(String lastName);
@@ -15,4 +16,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     @Query("SELECT u from User u where u.lastName = :lastName")
     List<User> findAllByLastNameQuery(@Param("lastName") String lastName);
+
+    Optional<User> findByEmail(String email);
 }

@@ -2,10 +2,7 @@ package pl.sdacademy.springdatauserdemo.model;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Data
@@ -24,4 +21,15 @@ public class User {
     private String email;
 
     private String phoneNumber;
+
+    private String password;
+
+    private boolean active;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public enum Role {
+        MVC_ROLE, REST_ROLE, ADMIN
+    }
 }

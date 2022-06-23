@@ -23,6 +23,7 @@ public class UserMvcController {
     @GetMapping("/add") // GET /mvc/user/add
     public String add(ModelMap model) {
         model.addAttribute("user", new User());
+        model.addAttribute("roles", User.Role.values());
         return "new-user";
     }
 
