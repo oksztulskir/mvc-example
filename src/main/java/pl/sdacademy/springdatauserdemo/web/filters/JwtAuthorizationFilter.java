@@ -18,6 +18,7 @@ import java.io.IOException;
 
 @Slf4j
 @Component
+@Profile("!integration-tests")
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
