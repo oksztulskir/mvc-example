@@ -4,22 +4,27 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import pl.sdacademy.springdatauserdemo.model.User;
+import pl.sdacademy.springdatauserdemo.web.filters.JwtAuthorizationFilter;
 
 import static pl.sdacademy.springdatauserdemo.model.User.Role.*;
 
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
+    private final JwtAuthorizationFilter authorizationFilter;
 
-    public WebSecurityConfig(@Qualifier("authUserDetailsService") UserDetailsService userDetailsService) {
+    public WebSecurityConfig(@Qualifier("authUserDetailsService") UserDetailsService userDetailsService, JwtAuthorizationFilter authorizationFilter) {
         this.userDetailsService = userDetailsService;
+        this.authorizationFilter = authorizationFilter;
     }
 
     @Override
@@ -27,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/mvc/user/**").hasAnyAuthority(MVC_ROLE.name(), ADMIN.name())
                 .antMatchers("/user/**").hasAnyAuthority(REST_ROLE.name(), ADMIN.name())
+                .antMatchers("/auth/**").permitAll()
                 .anyRequest().permitAll()
                 .and()
                 .formLogin()
@@ -38,6 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 ;
+        http.addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
 //    @Override
@@ -65,5 +72,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Primary
     public PasswordEncoder bcryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    @Override
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
     }
 }
